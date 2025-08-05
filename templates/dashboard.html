@@ -2,29 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
+    <title>Dashboard | Password Generator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <div class="container">
-        <h2>Welcome, {{ username }}</h2>
+<body style="background: linear-gradient(to right, #a1c4fd, #c2e9fb); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px;">
 
-        <form action="{{ url_for('generate_password') }}" method="POST">
-            <label for="length">Password Length:</label>
-            <input type="number" id="length" name="length" min="4" max="32" value="12" required>
-            <button type="submit">Generate Password</button>
+        <h2 style="text-align: center; color: #333; margin-bottom: 15px;">
+            🔐 Welcome, <br><strong>{{ username }}</strong>
+        </h2>
+
+        <form method="POST" action="{{ url_for('dashboard') }}">
+            <label>Password Length:</label>
+            <input type="number" name="length" min="6" max="30" value="12" required>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0;">
+                <input type="checkbox" name="uppercase" {% if 'uppercase' in selected_options %}checked{% endif %}> Uppercase
+                <input type="checkbox" name="lowercase" {% if 'lowercase' in selected_options %}checked{% endif %}> Lowercase
+                <input type="checkbox" name="digits" {% if 'digits' in selected_options %}checked{% endif %}> Digits
+                <input type="checkbox" name="symbols" {% if 'symbols' in selected_options %}checked{% endif %}> Symbols
+                <input type="checkbox" name="memorable" {% if memorable_selected %}checked{% endif %}> Memorable Password
+            </div>
+
+            <div class="button-row">
+                <button type="submit" class="btn-generate">Generate Password</button>
+                <button type="submit" name="refresh" value="1" class="btn-refresh">Refresh</button>
+            </div>
+
         </form>
 
         {% if generated_password %}
-            <div class="generated-password">
-                <h3>Generated Password:</h3>
-                <p>{{ generated_password }}</p>
+        <div style="margin-top: 20px;">
+            <h4 style="text-align: center; color: green;">Generated Password:</h4>
+            <div class="password-box">
+                <input type="text" id="generatedPassword" value="{{ generated_password }}" readonly>
+                <button class="copy-btn" onclick="copyPassword()">Copy</button>
             </div>
+        </div>
         {% endif %}
 
-        <br>
-        <a href="{{ url_for('view_passwords') }}" class="btn">View Saved Passwords</a>
-        <a href="{{ url_for('logout') }}" class="btn logout">Logout</a>
+        <div style="display: flex; justify-content: space-between; margin-top: 25px;">
+            <a href="{{ url_for('view_passwords') }}">
+                <button style="background-color: #ffc107; color: black;">📁 View Saved Passwords</button>
+            </a>
+            <a href="{{ url_for('logout') }}">
+                <button style="background-color: #dc3545;">🚪 Logout</button>
+            </a>
+        </div>
     </div>
+
+    <script>
+        function copyPassword() {
+            const passwordField = document.getElementById("generatedPassword");
+            passwordField.select();
+            passwordField.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(passwordField.value);
+            alert("Password copied to clipboard!");
+        }
+    </script>
 </body>
 </html>
